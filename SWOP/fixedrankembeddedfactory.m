@@ -19,10 +19,7 @@ function M = fixedrankembeddedfactory(m, n, k)
         Z.Vp = Z.Vp - X.V*(X.V'*Z.Vp);
     end
 
-    % For a given ambient vector Z, applies it to a matrix W. If Z is given
-    % as a matrix, this is straightforward. If Z is given as a structure
-    % with fields U, S, V such that Z = U*S*V', the product is executed
-    % efficiently.
+
     function ZW = apply_ambient(Z, W)
         if ~isstruct(Z)
             ZW = Z*W;
@@ -122,13 +119,11 @@ function M = fixedrankembeddedfactory(m, n, k)
     end
 
 
-    % Less safe but much faster checksum, June 24, 2014.
-    % Older version right below.
+
     M.hash = @(X) ['z' hashmd5([sum(X.U(:)) ; sum(X.S(:)); sum(X.V(:)) ])];
-    %M.hash = @(X) ['z' hashmd5([X.U(:) ; X.S(:) ; X.V(:)])];
+
     
     M.rand = @random;
-    % Factors U, V live on Stiefel manifolds: reuse their random generator.
     stiefelm = stiefelfactory(m, k);
     stiefeln = stiefelfactory(n, k);
     function X = random()
@@ -136,10 +131,7 @@ function M = fixedrankembeddedfactory(m, n, k)
         X.V = stiefeln.rand();
         X.S = diag(sort(rand(k, 1), 1, 'descend'));
     end
-    
-    % Generate a random tangent vector at X.
-    % Note: this may not be the uniform distribution over the set of
-    % unit-norm tangent vectors.
+
     M.randvec = @randomvec;
     function Z = randomvec(X)
         Z.M  = randn(k);
@@ -204,7 +196,6 @@ function M = fixedrankembeddedfactory(m, n, k)
 
 end
 
-% Linear combination of tangent vectors
 function d = lincomb(x, a1, d1, a2, d2) %#ok<INUSL>
 
     if nargin == 3
